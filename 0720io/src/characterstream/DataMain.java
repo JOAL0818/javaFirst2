@@ -46,9 +46,9 @@ public class DataMain {
 			
 		}catch (Exception e) {
 			System.out.println("¿¹¿Ü:" + e.getMessage());
-		} finally {
-			if (br != null)
+		} finally {			
 				try {
+					if (br != null)
 					br.close();
 				} catch (IOException e) {
 					e.printStackTrace();
