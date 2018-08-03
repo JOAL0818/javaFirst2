@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactDaoImpl implements ContactDao {
@@ -174,16 +175,64 @@ public class ContactDaoImpl implements ContactDao {
 	
 	@Override
 	public List<Contact> allContact (){
-		
-		return null;
+		//읽어온 데이터를 저장하기 위한 리스트생성
+		List<Contact>list = new ArrayList<Contact>();
+		connect();
+		try {
+			//contact테이블에 있는 전체 데이터를 가져오는 SQL실행객체 생성
+			pstmt = con.prepareStatement("select num, phone, name, email, birthday from contact");
+			//select하는 sql구문 실행
+			rs=pstmt.executeQuery();
+			
+			//반복문을 이용해 데이터를 읽어서 List에 저장
+			while(rs.next()) {
+				Contact contact = new Contact();
+				contact.setNum(rs.getInt("num"));
+				contact.setPhone(rs.getString("phone"));
+				contact.setName(rs.getString("name"));
+				contact.setEmail(rs.getString("email"));
+				contact.setBirthday(rs.getDate("birthday"));
+				//읽은 데이터를 리스트에 저장
+				list.add(contact);
+			}			
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}		
+		close();
+		return list;
 	}
 
+	
+	//name 컬럼에 매개변수로 주어진 데이터가 포함된 데이터를 조회
 	@Override
 	public List<Contact> nameContact (String name){
-		
-		return null;
+		List<Contact>list = new ArrayList<Contact>();		
+		connect();
+		try {
+			//contact테이블의 name컬럼에 name의 값이 포함된 데이터를 조회하는 SQL만들기
+			pstmt = con.prepareStatement("select * from contact where upper(name) like ?");
+			//물음표에 데이터바인딩하기
+			pstmt.setString(1, "%" + name + "%");
+			//SQL실행하기
+			rs = pstmt.executeQuery();
+			//데이터를 읽어서 list에 저장하기
+			while(rs.next()) {
+				//하나의 행을 읽어서 DTO에 저장
+				Contact contact = new Contact();
+				contact.setNum(rs.getInt("num"));
+				contact.setPhone(rs.getString("phone"));
+				contact.setName(rs.getString("name"));
+				contact.setEmail(rs.getString("email"));
+				contact.setBirthday(rs.getDate("birthday"));
+				//읽은 데이터를 리스트에 저장
+				list.add(contact);
+			}			
+		}catch(Exception e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}		
+		close();
+		return list;		
 	}
-
-
-
 }
